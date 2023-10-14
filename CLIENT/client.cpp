@@ -1141,7 +1141,7 @@ int main() {
                         code = WSAStartup(MAKEWORD(2, 2), &wsa);    
                         if (!code) {
                             cout << " [ 채팅방에 입장합니다. ]" << endl;
-                            my_nick = sql.getName();
+                            nickName = sql.getName();
                             closesocket(client_sock);
                             client_sock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
 
@@ -1154,7 +1154,7 @@ int main() {
                             {
                                 if (!connect(client_sock, (SOCKADDR*)&client_addr, sizeof(client_addr))) {
                                     cout << " ※주의※ 지인을 사칭하여 금전을 요구할 수 있으니 의심 된다면 대화를 중단해주시길 바랍니다." << endl;
-                                    send(client_sock, my_nick.c_str(), my_nick.length(), 0);
+                                    send(client_sock, nickName.c_str(), nickName.length(), 0);
                                     break;
                                 }
                                 cout << "Connecting..." << endl;
@@ -1198,10 +1198,44 @@ int main() {
             }
         else if (mainIn == 4) { // 설정
             setting();
+            bool backButton = false;
+            while (!backButton)
+            {
+                char settinIn = 0;
+                cout << "▶ ";
+                cin >> settingIn;
+                switch (settingIn)
+                {
+                    case '1':   
+                        sql.modifyPW(); // 비밀번호 변경
+                        continue;
+
+                    case '2':
+                        if (sql.deleteUser() == 1) return -1;
+                        else backButton = true;
+
+                    case '0':
+                        backButton = true;
+                        break;
+
+                    default:
+                        cout << " 잘못된 입력입니다. 다시 입력해주세요. " << endl;
+                }
+            }
+            }
+        else if (mainIn == 0) { // 종료
+                cout << "프로그램을 종료합니다. Bye Bye~" << endl;
+                return 0;
         }
 
-        
+        else {
+            cout << " 잘못된 입력입니다. 다시 입력해주세요. " << endl;
+        }
 
     }
 
+    delete result;
+    delete pstmt;
+    delete stmt;
+    delete con;
 }
